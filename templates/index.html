@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Figurine Collection</title>
+  <style>
+    body {font-family: sans-serif; margin: 2em;}
+    form {margin-bottom: 1em;}
+    table {border-collapse: collapse; width: 100%;}
+    th, td {border: 1px solid #ccc; padding: .5em;}
+    th {background: #f0f0f0;}
+  </style>
+</head>
+<body>
+  <h1>Ajouter une figurine</h1>
+  <form method="post" action="/collection">
+    <label for="figurine">Figurine :</label>
+    <select name="figurine" id="figurine">
+      {% for fig in figurines %}
+        <option value="{{ fig.name }}">{{ fig.faction }} - {{ fig.name }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Ajouter</button>
+  </form>
+
+  <h2>Collection actuelle</h2>
+  {% if collection %}
+  <table>
+    <thead><tr><th>Faction</th><th>Nom</th></tr></thead>
+    <tbody>
+      {% for fig in collection %}
+        <tr><td>{{ fig.faction }}</td><td>{{ fig.name }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>Aucune figurine pour le moment.</p>
+  {% endif %}
+</body>
+</html>
