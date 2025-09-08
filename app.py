@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import List, Dict
 
 from flask import Flask, request, jsonify, render_template_string
+from flask import Flask, request, jsonify, render_template
 
 from age_of_sigmar.figurines import FIGURINES, Figurine
 
@@ -37,13 +38,23 @@ def get_collection() -> List[Dict[str, str]]:
 def add_to_collection():
     if request.is_json:
         data = request.get_json() or {}
+        figurine_name = data.get("figurine")
         name = data.get("name")
         faction = data.get("faction")
     else:
+        figurine_name = request.form.get("figurine")
         name = request.form.get("name")
         faction = request.form.get("faction")
+
+    if figurine_name:
+        fig = next((f for f in FIGURINES if f.name == figurine_name), None)
+        if fig is None:
+            return {"error": "unknown figurine"}, 400
+        name, faction = fig.name, fig.faction
+
     if not name or not faction:
         return {"error": "name and faction required"}, 400
+
     collection = load_collection()
     collection.append({"name": name, "faction": faction})
     save_collection(collection)
@@ -72,6 +83,7 @@ FORM_HTML = """
 @app.get("/")
 def index():
     return render_template_string(FORM_HTML, collection=load_collection())
+    return render_template("index.html", collection=load_collection(), figurines=FIGURINES)
 
 
 if __name__ == "__main__":
